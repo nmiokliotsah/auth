@@ -1,0 +1,8 @@
+.formRegistration{
+    max-width: 400px;
+}
+
+.RegistrationError {
+    padding-bottom: 1rem;
+    color: red;
+}
