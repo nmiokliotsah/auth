@@ -53,5 +53,15 @@ export const api = {
                 'Content-Type': 'application/json'
             }
         });
+    },
+
+    geMe() {
+        return fetch(`/api/me`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTQsImlhdCI6MTU5MTg5NjQzMSwiZXhwIjoxNTkxODk2NTUxfQ.m4oLW_n4eyCv1FqJl7b3aa0VfDN0FlXRPeaHhjzcuxQ'
+            }
+        });
     }
 }

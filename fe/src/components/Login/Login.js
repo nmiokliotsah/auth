@@ -20,13 +20,9 @@ const Login = () => {
         email: '',
         password: ''
     }
-    return (
-        <div className={style.formLogin}>
-            <LoginForm
-                onSubmit={onSubmit}
-                initialValues={initialValues} />
-        </div>
-    );
+    return <LoginForm
+        onSubmit={onSubmit}
+        initialValues={initialValues} />
 }
 
 export default Login;

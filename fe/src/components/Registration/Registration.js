@@ -24,11 +24,7 @@ const Registration = () => {
         repeatPassword: ''
     }
 
-    return (
-        <div className={style.formRegistration}>
-            <RegistrationForm onSubmit={onSubmit} initialValues={initialValues} />
-        </div>
-    );
+    return <RegistrationForm onSubmit={onSubmit} initialValues={initialValues} />
 }
 
 export default Registration;
