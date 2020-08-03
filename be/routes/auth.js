@@ -1,13 +1,19 @@
+require('dotenv').config();
+
 const Router = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { validationResult } = require('express-validator');
 const { registerValidators } = require('../validators/validators');
 const { loginValidators } = require('../validators/validators');
+const { createAccessToken } = require('../utils/token');
+const { createRefreshToken } = require('../utils/token');
 const { getUserByEmail } = require('../utils/database');
 const withAuth = require('../middleware/middleware');
 const User = require('../models/users');
 const router = Router();
+
+let refreshTokens = [];
 
 router.post('/auth/login', loginValidators, async (req, res) => {
     try {
@@ -20,14 +26,12 @@ router.post('/auth/login', loginValidators, async (req, res) => {
 
         if (candidate.id) {
             const areSame = await bcrypt.compare(password, candidate.password);
-            const secret = 'muSecretValue'
             if (areSame) {
-                const payload = { id: candidate.id };
-                const token = jwt.sign(payload, secret, {
-                    expiresIn: '1h'
-                });
-                res.cookie('token', token, { httpOnly: true })
-                    .sendStatus(200);
+                const accessToken = createAccessToken(candidate.id, "muSecretValue1");
+                const refreshToken = createRefreshToken(candidate.id, 'muSecretValue2');
+                refreshTokens.push(refreshToken);
+                res.cookie('token', refreshToken, { httpOnly: true });
+                res.status(200).json({ accessToken });
             } else {
                 res.status(401).json({
                     message: 'Password or email are incorrect'
@@ -41,6 +45,11 @@ router.post('/auth/login', loginValidators, async (req, res) => {
     } catch (e) {
         console.log(e);
     }
+});
+
+router.delete('/logout', (req, res) => {
+    refreshTokens = refreshTokens.filter(token => token !== req.cookies.token)
+    res.sendStatus(204)
 });
 
 router.post('/auth/register', registerValidators, async (req, res) => {
@@ -69,8 +78,26 @@ router.post('/auth/register', registerValidators, async (req, res) => {
     }
 });
 
-router.get('/auth/token', withAuth, (req, res) => {
-    res.sendStatus(200);
+router.get('/auth/token', (req, res) => {
+    const refreshToken = req.cookies.token;
+
+    if (!refreshToken) {
+        return res.status(401).json({
+            message: 'Unauthorized: No token provided'
+        });
+    }
+    console.log(refreshTokens)
+    if (!refreshTokens.includes(refreshToken)) return res.sendStatus(403);
+
+    jwt.verify(refreshToken, "muSecretValue2", (err, user) => {
+        if (err) return res.sendStatus(403);
+        req.id = user.id;
+        const accessToken = createAccessToken(user.id , 'muSecretValue1');
+        res.json({ accessToken: accessToken });
+    });
 });
 
+router.get('/checkToken', withAuth, (req, res) => {
+    res.status(200);
+});
 module.exports = router;
