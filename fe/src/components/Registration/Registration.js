@@ -1,6 +1,5 @@
 import React from 'react';
 import { api } from '../../api/api';
-import style from './Registration.module.css';
 import RegistrationForm from './RegistrationForm';
 import history from '../../history/history'
 

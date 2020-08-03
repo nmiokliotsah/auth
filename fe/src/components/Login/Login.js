@@ -1,8 +1,7 @@
 import React from 'react';
 import LoginForm from './LoginForm';
 import { api } from '../../api/api';
-import style from './Login.module.css';
-import history from '../../history/history'
+import history from '../../history/history';
 
 const Login = () => {
     const onSubmit = (formData, actions) => {
@@ -10,7 +9,7 @@ const Login = () => {
         api.login(email, password)
             .then(res => {
                 if (res.status === 200) {
-                    history.push('/home');
+                    history.push('/');
                 } else {
                     actions.setFieldError("serverError", "This user does not exist");
                 }
